@@ -1,115 +1,132 @@
 document.addEventListener('DOMContentLoaded', () => {
-  
-  const todoForm = document.getElementById('todo-form');
-  const todoInput = document.getElementById('todo-input');
-  const errorMsg = document.getElementById('error-msg');
-  const todoList = document.getElementById('todo-list');
-  const counter = document.getElementById('counter');
-  const filterAll = document.getElementById('filter-all');
-  const filterActive = document.getElementById('filter-active');
-  const filterDone = document.getElementById('filter-done');
 
-  
-  let currentFilter = 'all'; 
-  
+  let ToDoForm = document.getElementById('todo-form');
+  let ToDoInput = document.getElementById('todo-input');
+  let AddButton = document.getElementById('add-btn');
+  let ErrorMsg = document.getElementById('error-msg');
+  let FilterAll = document.getElementById('filter-all');
+  let FilterActive = document.getElementById('filter-active');
+  let FilterDone = document.getElementById('filter-done');
+  let ToDoList = document.getElementById('todo-list');
+  let Counter = document.getElementById('counter');
+
+
+  let currentFilter = 'all';
+
   function updateCounter() {
-    const activeCount = todoList.querySelectorAll('li:not(.completed)').length;
-    
-    
-    let pluralSuffix = (activeCount === 1) ? '' : 's';
-    counter.textContent = activeCount + ' item' + pluralSuffix + ' left';
-  }
+    let items = ToDoList.querySelectorAll('li');
+    let activeCount = 0;
 
- 
-  function applyFilter() {
-    const items = todoList.querySelectorAll('li');
-    items.forEach(item => {
-      const isCompleted = item.classList.contains('completed');
-      if (currentFilter === 'all') {
-        item.classList.remove('hidden');
-      } else if (currentFilter === 'active') {
-        item.classList.toggle('hidden', isCompleted);
-      } else if (currentFilter === 'done') {
-        item.classList.toggle('hidden', !isCompleted);
+    for (let item of items) {
+      if (item.classList.contains('completed') == false) {
+        activeCount = activeCount + 1;
       }
-    });
+    }
+
+    if (activeCount == 1) {
+      Counter.textContent = activeCount + " item left";
+    } else {
+      Counter.textContent = activeCount + " items left";
+    }
   }
 
-  
-  todoForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const taskText = todoInput.value.trim();
 
-    if (taskText === '') {
-      errorMsg.classList.remove('hidden');
+  function applyFilter() {
+    let items = ToDoList.querySelectorAll('li');
+
+    for (let item of items) {
+      let isCompleted = item.classList.contains('completed');
+
+      if (currentFilter == 'all') {
+        item.style.display = 'flex';
+      }
+      else if (currentFilter == 'active') {
+        if (isCompleted) {
+          item.style.display = 'none';
+        } else {
+          item.style.display = 'flex';
+        }
+      }
+      else if (currentFilter == 'done') {
+        if (isCompleted) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      }
+    }
+  }
+
+
+  ToDoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let taskText = ToDoInput.value.trim();
+
+    if (taskText == '') {
+      ErrorMsg.classList.remove('hidden');
       return;
     }
 
-    
-    errorMsg.classList.add('hidden');
+    ErrorMsg.classList.add('hidden');
 
-    
-    const li = document.createElement('li');
-    
-    const textSpan = document.createElement('span');
-    textSpan.className = 'item-text';
-    textSpan.textContent = taskText;
+    let li = document.createElement('li');
 
-    const deleteBtn = document.createElement('button');
+    let span = document.createElement('span');
+    span.className = 'item-text';
+    span.textContent = taskText;
+
+    let deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.type = 'button';
     deleteBtn.textContent = 'Delete';
 
-    
-    li.appendChild(textSpan);
+    li.appendChild(span);
     li.appendChild(deleteBtn);
-    todoList.appendChild(li);
+    ToDoList.appendChild(li);
 
-    
-    todoInput.value = '';
+    ToDoInput.value = '';
 
-    
     applyFilter();
     updateCounter();
   });
 
-  
-  todoList.addEventListener('click', (e) => {
-    const target = e.target;
 
-    
-    if (target.classList.contains('item-text')) {
-      const parentLi = target.closest('li');
+  ToDoList.addEventListener('click', (event) => {
+    let target = event.target;
+
+    if (target.tagName == 'SPAN') {
+      let parentLi = target.parentNode;
       parentLi.classList.toggle('completed');
+
       applyFilter();
       updateCounter();
     }
 
-    
-    if (target.classList.contains('delete-btn')) {
-      const parentLi = target.closest('li');
+    if (target.tagName == 'BUTTON') {
+      let parentLi = target.parentNode;
       parentLi.remove();
+
+      applyFilter();
       updateCounter();
     }
   });
 
-  
-  filterAll.addEventListener('click', () => {
+
+
+  FilterAll.addEventListener('click', () => {
     currentFilter = 'all';
     applyFilter();
   });
 
-  filterActive.addEventListener('click', () => {
+  FilterActive.addEventListener('click', () => {
     currentFilter = 'active';
     applyFilter();
   });
 
-  filterDone.addEventListener('click', () => {
+  FilterDone.addEventListener('click', () => {
     currentFilter = 'done';
     applyFilter();
   });
-
-  updateCounter();
 });
 
 // ITCS333 A3 starter — implement the to-do app per README.
